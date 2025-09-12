@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appointments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f7f8fa] text-gray-800 font-sans text-sm">
+
+  <div class="max-w-6xl mx-auto px-4 py-6">
+
+    <!-- Tabs + Controls -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="bg-gray-100 rounded-md flex overflow-hidden">
+        <button class="px-4 py-1.5 text-gray-500">Missed</button>
+        <button class="px-4 py-1.5 bg-white text-blue-600 font-semibold shadow">Upcoming</button>
+        <button class="px-4 py-1.5 text-gray-500">Completed</button>
+      </div>
+      <div class="flex gap-2">
+        <button class="bg-[#116DFF] text-white px-4 py-1.5 rounded text-xs font-medium">+ Add appointment</button>
+        <button class="border border-gray-300 px-3 py-1.5 rounded text-xs text-gray-600">Filter</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow-sm overflow-x-auto">
+      <div class="p-4 border-b text-sm font-semibold flex items-center justify-between">
+        <span>Today</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+      <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-500 uppercase">
+          <tr>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Age</th>
+            <th class="px-4 py-2">Time</th>
+            <th class="px-4 py-2">Contact</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr>
+            <td class="px-4 py-2">Dianne Russell</td>
+            <td class="px-4 py-2">35</td>
+            <td class="px-4 py-2">12 pm</td>
+            <td class="px-4 py-2">+91 90000 00001</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Bessie Cooper</td>
+            <td class="px-4 py-2">42</td>
+            <td class="px-4 py-2">1 pm</td>
+            <td class="px-4 py-2">+91 90000 00002</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Marvin McKinney</td>
+            <td class="px-4 py-2">27</td>
+            <td class="px-4 py-2">2 pm</td>
+            <td class="px-4 py-2">+91 90000 00003</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Esther Howard</td>
+            <td class="px-4 py-2">45</td>
+            <td class="px-4 py-2">5 pm</td>
+            <td class="px-4 py-2">+91 90000 00004</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Marvin McKinney</td>
+            <td class="px-4 py-2">35</td>
+            <td class="px-4 py-2">6 pm</td>
+            <td class="px-4 py-2">+91 90000 00005</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Annette Black</td>
+            <td class="px-4 py-2">20</td>
+            <td class="px-4 py-2">7 pm</td>
+            <td class="px-4 py-2">+91 90000 00006</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Cameron Williamson</td>
+            <td class="px-4 py-2">33</td>
+            <td class="px-4 py-2">8 pm</td>
+            <td class="px-4 py-2">+91 90000 00007</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">Guy Hawkins</td>
+            <td class="px-4 py-2">60</td>
+            <td class="px-4 py-2">9 pm</td>
+            <td class="px-4 py-2">+91 90000 00008</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-6 text-xs text-gray-500">
+      <div class="flex items-center space-x-1">
+        <button class="px-2 py-1 border rounded bg-white">&larr; Previous</button>
+        <button class="px-2 py-1 border rounded bg-white">1</button>
+        <button class="px-2 py-1 border rounded bg-[#116DFF] text-white">2</button>
+        <button class="px-2 py-1 border rounded bg-white">3</button>
+        <button class="px-2 py-1 border rounded bg-white">4</button>
+        <button class="px-2 py-1 border rounded bg-white">5</button>
+        <button class="px-2 py-1 border rounded bg-white">... 10</button>
+        <button class="px-2 py-1 border rounded bg-white">Next &rarr;</button>
+      </div>
+      <div>
+        Page <span class="font-medium">2</span> of <span class="font-medium">34</span>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

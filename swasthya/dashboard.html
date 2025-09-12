@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swasthya Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-100 text-gray-800">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between p-6">
+        <div>
+          <div class="text-2xl font-bold mb-10">❤️ Swasthya</div>
+          <ul class="space-y-3">
+            <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+              <i class="fas fa-home mr-3"></i> Overview
+            </li>
+            <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+              <i class="fas fa-calendar-check mr-3"></i> Appointments
+            </li>
+            <li class="flex items-center p-2 rounded bg-white text-blue-900 font-bold cursor-pointer">
+              <i class="fas fa-user-injured mr-3"></i> Patients
+            </li>
+            <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+              <i class="fas fa-calendar-alt mr-3"></i> Schedule
+            </li>
+            <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+              <i class="fas fa-envelope mr-3"></i> Messages
+              <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">3</span>
+            </li>
+          </ul>
+        </div>
+        <ul class="space-y-3 mt-10">
+          <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+            <i class="fas fa-question-circle mr-3"></i> Help
+          </li>
+          <li class="flex items-center p-2 rounded hover:bg-white/10 cursor-pointer">
+            <i class="fas fa-cog mr-3"></i> Settings
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-6 overflow-y-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-semibold">Dashboard <span class="text-gray-500 text-base">/ Patients</span></h2>
+          </div>
+          <div class="flex items-center gap-4">
+            <i class="far fa-bell text-xl"></i>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <strong>Dr Amirul Haque</strong>
+                <div class="text-sm text-gray-500">Urologist</div>
+              </div>
+              <img src="assets/dash.jpeg" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover border-2 border-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-4">
+          <button class="bg-gray-200 text-sm rounded-full px-4 py-1 mr-2">Overview</button>
+          <button class="bg-blue-600 text-white text-sm rounded-full px-4 py-1 mr-2">Hospitalized</button>
+          <button class="bg-gray-200 text-sm rounded-full px-4 py-1">Outpatients</button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="bg-white p-6 rounded-xl shadow">
+          <!-- Header -->
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Patients List</h3>
+            <div class="space-x-2">
+              <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">+ Add Patient</button>
+              <button class="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm font-medium">Filter</button>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+            <span><span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>Discharged</span>
+            <span><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>Report Pending</span>
+            <span><span class="inline-block w-3 h-3 rounded-full bg-purple-500 mr-2"></span>ICU</span>
+            <span><span class="inline-block w-3 h-3 rounded-full bg-teal-500 mr-2"></span>In Recovery</span>
+            <span><span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>Life Support</span>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="py-2 px-4 text-left">Admitted</th>
+                  <th class="py-2 px-4 text-left">Patient</th>
+                  <th class="py-2 px-4 text-left">Room</th>
+                  <th class="py-2 px-4 text-left">Area of Concern</th>
+                  <th class="py-2 px-4 text-left">In Charge</th>
+                  <th class="py-2 px-4 text-left">Status</th>
+                  <th class="py-2 px-4 text-left">Contact</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr>
+                  <td class="py-2 px-4">27 Dec, 2024</td>
+                  <td class="py-2 px-4">Dianne Russell</td>
+                  <td class="py-2 px-4">BC5001</td>
+                  <td class="py-2 px-4">Upper Abdomen General</td>
+                  <td class="py-2 px-4">Kristin</td>
+                  <td class="py-2 px-4"><span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full">Report Pending</span></td>
+                  <td class="py-2 px-4"><i class="far fa-envelope"></i></td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-4">03 Feb, 2023</td>
+                  <td class="py-2 px-4">Bessie Cooper</td>
+                  <td class="py-2 px-4">DMK502</td>
+                  <td class="py-2 px-4">Gynecologic Disorders</td>
+                  <td class="py-2 px-4">Kristin</td>
+                  <td class="py-2 px-4"><span class="bg-red-500 text-white text-xs px-3 py-1 rounded-full">Life Support</span></td>
+                  <td class="py-2 px-4"><i class="far fa-comment"></i></td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-4">02 Mar, 2023</td>
+                  <td class="py-2 px-4">Marvin McKinney</td>
+                  <td class="py-2 px-4">DMK502</td>
+                  <td class="py-2 px-4">Brain, Spinal Cord, and Nerve Disorders</td>
+                  <td class="py-2 px-4">Colleen</td>
+                  <td class="py-2 px-4"><span class="bg-purple-500 text-white text-xs px-3 py-1 rounded-full">ICU</span></td>
+                  <td class="py-2 px-4"><i class="fas fa-phone"></i></td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-4">02 Mar, 2023</td>
+                  <td class="py-2 px-4">Esther Howard</td>
+                  <td class="py-2 px-4">DMK502</td>
+                  <td class="py-2 px-4">Digestive Disorders</td>
+                  <td class="py-2 px-4">Colleen</td>
+                  <td class="py-2 px-4"><span class="bg-green-500 text-white text-xs px-3 py-1 rounded-full">Discharged</span></td>
+                  <td class="py-2 px-4"><i class="fas fa-phone"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex items-center justify-between mt-6 text-sm">
+            <div>
+              <button class="px-3 py-1 border rounded mr-2">&laquo; Previous</button>
+              <button class="px-3 py-1 border bg-blue-600 text-white rounded mr-2">2</button>
+              <button class="px-3 py-1 border rounded mr-2">3</button>
+              <button class="px-3 py-1 border rounded">4</button>
+              <button class="px-3 py-1 border rounded ml-2">Next &raquo;</button>
+            </div>
+            <div>Page <strong>2</strong> of 34</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

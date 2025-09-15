@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
+import Layout from './components/layout/Layout';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -9,6 +10,7 @@ import HealthProfile from './pages/HealthProfile';
 import MedicalRecords from './pages/MedicalRecords';
 import QRCode from './pages/QRCode';
 import EmergencyAccess from './pages/EmergencyAccess';
+import DebugAuth from './components/DebugAuth';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -25,9 +27,14 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
-          <Routes>
-            {/* Public routes */}
+        <Routes>
+          {/* Public routes with layout */}
+          <Route element={<Layout />}>
+            <Route path="/" element={
+              <PublicRoute>
+                <LandingPage />
+              </PublicRoute>
+            } />
             <Route path="/login" element={
               <PublicRoute>
                 <Login />
@@ -38,27 +45,36 @@ function App() {
                 <Register />
               </PublicRoute>
             } />
-            <Route path="/e/:publicId" element={<EmergencyAccess />} />
             
             {/* Protected routes */}
-            <Route path="/*" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
-                <div>
-                  <Navbar />
-                  <main className="main-content">
-                    <Routes>
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/profile" element={<HealthProfile />} />
-                      <Route path="/records" element={<MedicalRecords />} />
-                      <Route path="/qr" element={<QRCode />} />
-                      <Route path="/" element={<Navigate to="/dashboard" />} />
-                    </Routes>
-                  </main>
-                </div>
+                <Dashboard />
               </ProtectedRoute>
             } />
-          </Routes>
-        </div>
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <HealthProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/records" element={
+              <ProtectedRoute>
+                <MedicalRecords />
+              </ProtectedRoute>
+            } />
+            <Route path="/qr" element={
+              <ProtectedRoute>
+                <QRCode />
+              </ProtectedRoute>
+            } />
+          </Route>
+          
+          {/* Debug route (development only) */}
+          <Route path="/debug" element={<DebugAuth />} />
+          
+          {/* Emergency access without layout */}
+          <Route path="/e/:publicId" element={<EmergencyAccess />} />
+        </Routes>
       </Router>
     </AuthProvider>
   );

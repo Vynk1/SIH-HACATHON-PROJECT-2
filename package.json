@@ -4,6 +4,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "demo": "node demo-server.js",
+    "demo-dev": "concurrently --names \"DEMO-API,WEB\" --colors \"blue,green\" \"nodemon demo-server.js\" \"npm run client\"",
+    "init-demo": "node scripts/init-demo-data.js",
+    "test-api": "node scripts/test-api.js",
+    "test-upload": "node scripts/test-upload.js",
     "server": "nodemon server.js",
     "client": "cd frontend && npm start",
     "dev": "concurrently --names \"API,WEB\" --colors \"blue,green\" \"npm run server\" \"npm run client\"",
@@ -19,18 +24,26 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "nanoid": "^5.1.5",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "validator": "^13.15.15",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "concurrently": "^7.6.0",
@@ -42,8 +55,12 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
-    "testMatch": ["<rootDir>/tests/**/*.test.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ],
     "collectCoverageFrom": [
       "controller/**/*.js",
       "models/**/*.js",
@@ -52,6 +69,13 @@
       "routes/**/*.js"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"]
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "moduleNameMapper": {
+      "^nanoid$": "<rootDir>/tests/__mocks__/nanoid.js"
+    }
   }
 }

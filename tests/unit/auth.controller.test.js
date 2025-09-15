@@ -246,7 +246,7 @@ describe('Auth Controller', () => {
     });
 
     it('should return 401 if user not authenticated', async () => {
-      req.user = null;
+      req.user = {}; // Empty object instead of null
 
       await authController.me(req, res);
 

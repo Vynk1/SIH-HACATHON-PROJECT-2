@@ -36,16 +36,36 @@ export const AuthProvider = ({ children }) => {
       setError('');
       setLoading(true);
       
+      console.log('AuthContext: Attempting login for:', email);
       const response = await authAPI.login({ email, password });
+      console.log('AuthContext: Login response received:', response.status);
+      
       const { token, user: userData } = response.data;
+      
+      if (!token) {
+        throw new Error('No token received from server');
+      }
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       
+      console.log('AuthContext: Login successful for:', userData.full_name);
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 'Login failed';
+      console.error('AuthContext: Login error:', err);
+      let message = 'Login failed';
+      
+      if (err.response) {
+        message = err.response.data?.message || `Server error: ${err.response.status}`;
+        console.error('AuthContext: Server error response:', err.response.data);
+      } else if (err.request) {
+        message = 'Network error - unable to connect to server';
+        console.error('AuthContext: Network error:', err.request);
+      } else {
+        message = err.message || 'Unknown error occurred';
+      }
+      
       setError(message);
       return { success: false, error: message };
     } finally {
@@ -58,16 +78,36 @@ export const AuthProvider = ({ children }) => {
       setError('');
       setLoading(true);
       
+      console.log('AuthContext: Attempting registration for:', userData.email);
       const response = await authAPI.register(userData);
+      console.log('AuthContext: Registration response received:', response.status);
+      
       const { token, user: newUser } = response.data;
+      
+      if (!token) {
+        throw new Error('No token received from server');
+      }
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(newUser));
       setUser(newUser);
       
+      console.log('AuthContext: Registration successful for:', newUser.full_name);
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 'Registration failed';
+      console.error('AuthContext: Registration error:', err);
+      let message = 'Registration failed';
+      
+      if (err.response) {
+        message = err.response.data?.message || `Server error: ${err.response.status}`;
+        console.error('AuthContext: Server error response:', err.response.data);
+      } else if (err.request) {
+        message = 'Network error - unable to connect to server';
+        console.error('AuthContext: Network error:', err.request);
+      } else {
+        message = err.message || 'Unknown error occurred';
+      }
+      
       setError(message);
       return { success: false, error: message };
     } finally {

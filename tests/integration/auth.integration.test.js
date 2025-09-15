@@ -11,7 +11,7 @@ describe('Auth Integration Tests', () => {
         full_name: 'John Doe',
         email: 'john.doe@example.com',
         phone: '+1234567890',
-        password: 'password123',
+        password: 'Password123',
         role: 'patient'
       };
 
@@ -42,7 +42,7 @@ describe('Auth Integration Tests', () => {
         })
         .expect(400);
 
-      expect(response.body.message).toBe('name, email and password required');
+      expect(response.body.message).toContain('Full name must be between 2 and 100 characters');
     });
 
     it('should return 409 for duplicate email', async () => {
@@ -50,7 +50,7 @@ describe('Auth Integration Tests', () => {
       const userData = {
         full_name: 'John Doe',
         email: 'duplicate@example.com',
-        password: 'password123'
+        password: 'Password123'
       };
 
       await request(app)
@@ -64,7 +64,7 @@ describe('Auth Integration Tests', () => {
         .send({
           full_name: 'Jane Doe',
           email: 'duplicate@example.com',
-          password: 'password456'
+          password: 'Password456'
         })
         .expect(409);
 
@@ -75,7 +75,7 @@ describe('Auth Integration Tests', () => {
       const userData = {
         full_name: 'John Doe',
         email: 'JOHN.DOE@EXAMPLE.COM',
-        password: 'password123'
+        password: 'Password123'
       };
 
       const response = await request(app)
@@ -98,7 +98,7 @@ describe('Auth Integration Tests', () => {
         .send({
           full_name: 'Test User',
           email: 'test.user@example.com',
-          password: 'password123'
+          password: 'Password123'
         });
     });
 
@@ -107,7 +107,7 @@ describe('Auth Integration Tests', () => {
         .post('/api/auth/login')
         .send({
           email: 'test.user@example.com',
-          password: 'password123'
+          password: 'Password123'
         })
         .expect(200);
 
@@ -126,7 +126,7 @@ describe('Auth Integration Tests', () => {
         })
         .expect(400);
 
-      expect(response.body.message).toBe('email and password required');
+      expect(response.body.message).toBe('Password is required');
     });
 
     it('should return 401 for invalid email', async () => {
@@ -158,7 +158,7 @@ describe('Auth Integration Tests', () => {
         .post('/api/auth/login')
         .send({
           email: 'TEST.USER@EXAMPLE.COM',
-          password: 'password123'
+          password: 'Password123'
         })
         .expect(200);
 
@@ -177,7 +177,7 @@ describe('Auth Integration Tests', () => {
         .send({
           full_name: 'Auth Test User',
           email: 'auth.test@example.com',
-          password: 'password123'
+          password: 'Password123'
         });
 
       authToken = registerResponse.body.token;

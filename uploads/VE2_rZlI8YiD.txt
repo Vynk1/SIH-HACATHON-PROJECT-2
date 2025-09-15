@@ -1,0 +1,12 @@
+LAB REPORT
+
+Patient: Mr. Amit Patel
+Test Date: Tue Mar 05 2024 05:30:00 GMT+0530 (India Standard Time)
+Report: Lipid Profile
+
+Results:
+- All values within normal range
+- Follow-up recommended
+
+Tested by: City Lab
+Report ID: LAB1380

@@ -13,7 +13,16 @@ exports.getMyProfile = async (req, res) => {
     const user = await User.findById(userId).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const profile = await HealthProfile.findOne({ user_id: userId }).lean();
+    const healthProfile = await HealthProfile.findOne({ user_id: userId }).lean();
+    
+    // Structure the response to match frontend expectations
+    const profile = {
+      ...user.toObject(),
+      health_profile: healthProfile,
+      // For backward compatibility, also include health profile fields directly
+      ...healthProfile
+    };
+    
     res.json({ user, profile });
   } catch (err) {
     console.error('getMyProfile', err);
@@ -56,8 +65,19 @@ exports.upsertHealthProfile = async (req, res) => {
     await profile.save();
     res.json(profile);
   } catch (err) {
-    console.error('upsertHealthProfile', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('upsertHealthProfile error:', err);
+    
+    // Handle specific mongoose errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: 'Validation error', errors });
+    }
+    
+    if (err.code === 11000) {
+      return res.status(409).json({ message: 'Duplicate key error' });
+    }
+    
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 

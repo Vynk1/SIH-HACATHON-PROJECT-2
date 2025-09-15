@@ -1,0 +1,13 @@
+PRESCRIPTION
+
+Patient: Mrs. Sunita Verma
+Date: Tue Jan 30 2024 05:30:00 GMT+0530 (India Standard Time)
+
+Medication:
+- Chronic Migraine Diagnosis
+
+Instructions:
+Diagnosed with chronic migraine, prescribed preventive medication
+
+Prescribed by: Dr. Smith
+License: MD12345

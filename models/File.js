@@ -8,6 +8,7 @@ const fileSchema = new mongoose.Schema({
   filename: { type: String },
   mime: { type: String },
   size: { type: Number },
+  upload_method: { type: String, enum: ['cloudinary', 'local'], default: 'local' },
   uploaded_at: { type: Date, default: Date.now },
   meta: { type: Object }
 }, { timestamps: false });

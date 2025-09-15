@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Frontend-Backend Communication</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>🔍 Debug Frontend-Backend Communication</h1>
+    
+    <div id="status"></div>
+    
+    <h2>Test Registration</h2>
+    <form id="registerForm">
+        <input type="text" id="fullName" placeholder="Full Name" required><br><br>
+        <input type="email" id="email" placeholder="Email" required><br><br>
+        <input type="password" id="password" placeholder="Password" required><br><br>
+        <button type="submit">Register</button>
+    </form>
+    
+    <h2>Test Login</h2>
+    <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required><br><br>
+        <input type="password" id="loginPassword" placeholder="Password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+    
+    <div id="results" style="margin-top: 20px; padding: 20px; background: #f0f0f0;"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        const results = document.getElementById('results');
+        const status = document.getElementById('status');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : (type === 'success' ? 'green' : 'blue');
+            div.style.margin = '5px 0';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        // Test server connectivity
+        async function testConnection() {
+            try {
+                const response = await axios.get(`${API_BASE}/health`);
+                log('✅ Server connection successful', 'success');
+                log(`Server status: ${response.data.status}`, 'info');
+                status.innerHTML = '<span style="color: green;">✅ Server Connected</span>';
+            } catch (error) {
+                log('❌ Server connection failed: ' + error.message, 'error');
+                status.innerHTML = '<span style="color: red;">❌ Server Disconnected</span>';
+            }
+        }
+
+        // Test registration
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                full_name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: 'patient'
+            };
+
+            log('🔄 Testing registration...', 'info');
+            
+            try {
+                const response = await axios.post(`${API_BASE}/api/auth/register`, userData);
+                log('✅ Registration successful!', 'success');
+                log(`Token: ${response.data.token.substring(0, 20)}...`, 'info');
+                log(`User: ${response.data.user.full_name} (${response.data.user.email})`, 'info');
+                
+                // Store for login test
+                document.getElementById('loginEmail').value = userData.email;
+                document.getElementById('loginPassword').value = userData.password;
+                
+            } catch (error) {
+                log('❌ Registration failed: ' + (error.response?.data?.message || error.message), 'error');
+                if (error.response) {
+                    log(`Status: ${error.response.status}`, 'error');
+                    log(`Response: ${JSON.stringify(error.response.data)}`, 'error');
+                }
+            }
+        });
+
+        // Test login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const credentials = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            log('🔄 Testing login...', 'info');
+            
+            try {
+                const response = await axios.post(`${API_BASE}/api/auth/login`, credentials);
+                log('✅ Login successful!', 'success');
+                log(`Token: ${response.data.token.substring(0, 20)}...`, 'info');
+                log(`User: ${response.data.user.full_name} (${response.data.user.email})`, 'info');
+                
+            } catch (error) {
+                log('❌ Login failed: ' + (error.response?.data?.message || error.message), 'error');
+                if (error.response) {
+                    log(`Status: ${error.response.status}`, 'error');
+                    log(`Response: ${JSON.stringify(error.response.data)}`, 'error');
+                }
+            }
+        });
+
+        // Test connection on load
+        testConnection();
+    </script>
+</body>
+</html>

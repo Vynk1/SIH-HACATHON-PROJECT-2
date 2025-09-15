@@ -55,19 +55,40 @@ exports.createRecord = async (req, res) => {
 exports.listRecords = async (req, res) => {
   try {
     const userId = req.user.id || req.user._id;
-    const { user_id, page = 1, limit = 20 } = req.query;
+    const { user_id, page = 1, limit = 20, type, q } = req.query;
 
-    const target = user_id || userId;
+    console.log('listRecords - userId:', userId, 'query:', req.query);
+
+    const target = user_id || String(userId);
+    
     // if requesting other user's records, only providers/admin can view
-    if (target !== String(userId) && !(req.user.role === 'provider' || req.user.role === 'admin')) {
+    if (String(target) !== String(userId) && !(req.user.role === 'provider' || req.user.role === 'admin')) {
+      console.log('listRecords - BLOCKED: not allowed to view other user records');
       return res.status(403).json({ message: 'Not allowed' });
     }
 
-    const filter = { user_id: target };
+    const filter = { user_id: target, deleted: { $ne: true } };
+    
+    // Add type filter if specified
+    if (type && type !== '') {
+      filter.type = type;
+    }
+    
+    // Add search filter if specified
+    if (q && q !== '') {
+      filter.$or = [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { tags: { $in: [new RegExp(q, 'i')] } }
+      ];
+    }
+    
     // apply visibility filter for non-admin/provider and when viewing others
     if (!(req.user.role === 'provider' || req.user.role === 'admin') && target !== String(userId)) {
       filter.visibility = { $in: ['public_emergency', 'shared'] };
     }
+
+    console.log('listRecords - filter:', JSON.stringify(filter, null, 2));
 
     const total = await MedicalRecord.countDocuments(filter);
     const data = await MedicalRecord.find(filter)
@@ -76,10 +97,12 @@ exports.listRecords = async (req, res) => {
       .limit(Number(limit))
       .lean();
 
+    console.log('listRecords - found', data.length, 'records out of', total, 'total');
+
     res.json({ meta: { page: Number(page), limit: Number(limit), total }, data });
   } catch (err) {
-    console.error('listRecords', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('listRecords error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 

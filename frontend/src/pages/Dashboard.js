@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { userAPI, recordsAPI } from '../services/api';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { 
   Heart, 
   User, 
@@ -10,7 +12,8 @@ import {
   Calendar,
   Activity,
   AlertCircle,
-  Plus
+  Plus,
+  ArrowRight
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -32,17 +35,25 @@ const Dashboard = () => {
     try {
       // Load user profile
       const profileRes = await userAPI.getMyProfile();
+      console.log('Profile response:', profileRes.data);
       setProfile(profileRes.data.profile);
       
       // Load recent records
       const recordsRes = await recordsAPI.getRecords({ limit: 5 });
+      console.log('Records response:', recordsRes.data);
       setRecentRecords(recordsRes.data.data);
       
-      // Calculate stats
+      // Calculate stats with better data access
+      const healthProfile = profileRes.data.profile;
+      const emergencyContacts = healthProfile?.emergency_contacts || [];
+      
+      console.log('Health profile:', healthProfile);
+      console.log('Emergency contacts:', emergencyContacts);
+      
       setStats({
         totalRecords: recordsRes.data.meta.total,
         lastVisit: recordsRes.data.data[0]?.date_of_visit,
-        emergencyContacts: profileRes.data.profile?.emergency_contacts?.length || 0
+        emergencyContacts: emergencyContacts.length
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -72,18 +83,18 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="main-content">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white p-6 rounded-lg shadow">
-                  <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
-                  <div className="h-6 bg-gray-300 rounded w-1/3"></div>
-                </div>
-              ))}
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-muted rounded w-1/4 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+                  <div className="h-6 bg-muted rounded w-1/3"></div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
@@ -91,124 +102,140 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="main-content">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.full_name?.split(' ')[0]}!
-          </h1>
-          <p className="text-gray-600">
-            Here's an overview of your health information
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      {/* Welcome Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">
+          Welcome back, {user?.full_name?.split(' ')[0]}!
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Here's an overview of your health information
+        </p>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-primary-100 rounded-lg">
-                <FileText className="h-6 w-6 text-primary-600" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Medical Records</p>
+                  <p className="text-2xl font-bold">{stats.totalRecords}</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Medical Records</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalRecords}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-green-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-accent/10 rounded-lg">
+                  <Calendar className="h-6 w-6 text-accent" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Last Visit</p>
+                  <p className="text-lg font-bold">{formatDate(stats.lastVisit)}</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Last Visit</p>
-                <p className="text-lg font-bold text-gray-900">{formatDate(stats.lastVisit)}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <AlertCircle className="h-6 w-6 text-orange-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-orange-500/10 rounded-lg">
+                  <AlertCircle className="h-6 w-6 text-orange-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Emergency Contacts</p>
+                  <p className="text-2xl font-bold">{stats.emergencyContacts}</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Emergency Contacts</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.emergencyContacts}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Activity className="h-6 w-6 text-purple-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-500/10 rounded-lg">
+                  <Activity className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Profile Status</p>
+                  <p className="text-lg font-bold">
+                    {profile ? 'Complete' : 'Incomplete'}
+                  </p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Profile Status</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {profile ? 'Complete' : 'Incomplete'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+      </div>
 
-        {/* Quick Actions & Health Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      {/* Quick Actions & Health Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <Link
-                to="/records"
-                className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group"
-              >
-                <Plus className="h-8 w-8 text-gray-400 group-hover:text-primary-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700 group-hover:text-primary-600">
-                  Add Record
-                </span>
-              </Link>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardDescription>Manage your health information</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Link
+                  to="/records"
+                  className="flex flex-col items-center p-4 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors group"
+                >
+                  <Plus className="h-8 w-8 text-muted-foreground group-hover:text-primary mb-2" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-primary">
+                    Add Record
+                  </span>
+                </Link>
 
-              <Link
-                to="/profile"
-                className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group"
-              >
-                <User className="h-8 w-8 text-gray-400 group-hover:text-primary-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700 group-hover:text-primary-600">
-                  Update Profile
-                </span>
-              </Link>
+                <Link
+                  to="/profile"
+                  className="flex flex-col items-center p-4 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors group"
+                >
+                  <User className="h-8 w-8 text-muted-foreground group-hover:text-primary mb-2" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-primary">
+                    Update Profile
+                  </span>
+                </Link>
 
-              <Link
-                to="/qr"
-                className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group"
-              >
-                <QrCode className="h-8 w-8 text-gray-400 group-hover:text-primary-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700 group-hover:text-primary-600">
-                  View QR Code
-                </span>
-              </Link>
+                <Link
+                  to="/qr"
+                  className="flex flex-col items-center p-4 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors group"
+                >
+                  <QrCode className="h-8 w-8 text-muted-foreground group-hover:text-primary mb-2" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-primary">
+                    View QR Code
+                  </span>
+                </Link>
 
-              <a
-                href={`/e/${profile?.public_emergency_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors group"
-              >
-                <Heart className="h-8 w-8 text-gray-400 group-hover:text-primary-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700 group-hover:text-primary-600">
-                  Emergency View
-                </span>
-              </a>
-            </div>
-          </div>
+                <a
+                  href={`/e/${profile?.public_emergency_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center p-4 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors group"
+                >
+                  <Heart className="h-8 w-8 text-muted-foreground group-hover:text-primary mb-2" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-primary">
+                    Emergency View
+                  </span>
+                </a>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Health Summary */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Health Summary</h3>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Health Summary</CardTitle>
+              <CardDescription>Your key health information</CardDescription>
+            </CardHeader>
+            <CardContent>
             {profile ? (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -245,48 +272,49 @@ const Dashboard = () => {
             ) : (
               <div className="text-center py-4">
                 <p className="text-gray-500 mb-4">Complete your health profile to see summary</p>
-                <Link
-                  to="/profile"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Complete Profile
-                </Link>
+                <Button asChild>
+                  <Link to="/profile">
+                    Complete Profile
+                  </Link>
+                </Button>
               </div>
             )}
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+      </div>
 
-        {/* Recent Records */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
+      {/* Recent Records */}
+      <Card>
+          <CardHeader>
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Medical Records</h3>
-              <Link
-                to="/records"
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-              >
-                View all
-              </Link>
+              <div>
+                <CardTitle>Recent Medical Records</CardTitle>
+                <CardDescription>Your latest health records</CardDescription>
+              </div>
+              <Button variant="outline" asChild>
+                <Link to="/records" className="inline-flex items-center gap-2">
+                  View all <ArrowRight className="size-4" />
+                </Link>
+              </Button>
             </div>
-          </div>
-          
-          <div className="px-6 py-4">
+          </CardHeader>
+          <CardContent>
             {recentRecords.length > 0 ? (
               <div className="space-y-4">
                 {recentRecords.map((record) => (
                   <div
                     key={record._id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center">
-                      <div className="p-2 bg-blue-100 rounded-lg mr-4">
-                        <FileText className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-primary/10 rounded-lg mr-4">
+                        <FileText className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium">
                           {record.title || `${record.type} Record`}
                         </h4>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {formatDate(record.date_of_visit)} • {record.type}
                         </p>
                       </div>
@@ -299,8 +327,8 @@ const Dashboard = () => {
                       )}
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                         record.visibility === 'private' 
-                          ? 'text-gray-800 bg-gray-100'
-                          : 'text-blue-800 bg-blue-100'
+                          ? 'text-muted-foreground bg-muted'
+                          : 'text-primary bg-primary/10'
                       }`}>
                         {record.visibility}
                       </span>
@@ -310,20 +338,18 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">No medical records yet</h4>
-                <p className="text-gray-500 mb-4">Start by adding your first medical record</p>
-                <Link
-                  to="/records"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Add First Record
-                </Link>
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium mb-2">No medical records yet</h4>
+                <p className="text-muted-foreground mb-4">Start by adding your first medical record</p>
+                <Button asChild>
+                  <Link to="/records">
+                    Add First Record
+                  </Link>
+                </Button>
               </div>
             )}
-          </div>
-        </div>
-      </div>
+          </CardContent>
+      </Card>
     </div>
   );
 };

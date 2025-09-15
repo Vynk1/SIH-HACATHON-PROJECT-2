@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../services/api';
-import { User, Heart, Phone, Calendar, Save, Plus, X, AlertTriangle } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { User, Heart, Phone, Save, Plus, X, AlertTriangle } from 'lucide-react';
 
 const HealthProfile = () => {
   const [profile, setProfile] = useState({
@@ -144,21 +147,21 @@ const HealthProfile = () => {
 
   if (loading) {
     return (
-      <div className="main-content">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/3 mb-6"></div>
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white p-6 rounded-lg shadow">
-                  <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
-                  <div className="space-y-4">
-                    <div className="h-4 bg-gray-300 rounded w-full"></div>
-                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse max-w-4xl mx-auto">
+          <div className="h-8 bg-muted rounded w-1/3 mb-6"></div>
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <div className="h-6 bg-muted rounded w-1/4 mb-4"></div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="h-4 bg-muted rounded w-full"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
@@ -166,20 +169,20 @@ const HealthProfile = () => {
   }
 
   return (
-    <div className="main-content">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Health Profile</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Health Profile</h1>
+          <p className="text-muted-foreground text-lg">
             Manage your health information and emergency details
           </p>
         </div>
 
         {message.text && (
-          <div className={`mb-6 p-4 rounded-md ${
+          <div className={`mb-6 p-4 rounded-md border ${
             message.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-green-50 text-green-800 border-green-200'
+              : 'bg-destructive/15 text-destructive border-destructive/20'
           }`}>
             {message.text}
           </div>
@@ -187,17 +190,21 @@ const HealthProfile = () => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center mb-4">
-              <User className="h-5 w-5 text-primary-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
-            </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Basic Information</CardTitle>
+                  <CardDescription>Your personal health details</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth
-                </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="dob">Date of Birth</Label>
                 <input
                   type="date"
                   value={profile.dob ? new Date(profile.dob).toISOString().split('T')[0] : ''}
@@ -264,14 +271,21 @@ const HealthProfile = () => {
                 />
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Medical Information */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center mb-4">
-              <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Medical Information</h2>
-            </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Medical Information</CardTitle>
+                  <CardDescription>Allergies, conditions, and medications</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
 
             {/* Allergies */}
             <div className="mb-6">
@@ -287,13 +301,13 @@ const HealthProfile = () => {
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())}
                 />
-                <button
+                <Button
                   type="button"
                   onClick={addAllergy}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  size="sm"
                 >
                   <Plus className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {profile.allergies.map((allergy, index) => (
@@ -325,13 +339,13 @@ const HealthProfile = () => {
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCondition())}
                 />
-                <button
+                <Button
                   type="button"
                   onClick={addCondition}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  size="sm"
                 >
                   <Plus className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {profile.chronic_conditions.map((condition, index) => (
@@ -376,13 +390,13 @@ const HealthProfile = () => {
                   placeholder="Frequency"
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={addMedication}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  size="sm"
                 >
                   <Plus className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
               <div className="space-y-2">
                 {profile.medications.map((med, index) => (
@@ -406,14 +420,21 @@ const HealthProfile = () => {
                 ))}
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Emergency Contacts */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center mb-4">
-              <Phone className="h-5 w-5 text-green-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Emergency Contacts</h2>
-            </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Emergency Contacts</CardTitle>
+                  <CardDescription>People to contact in case of emergency</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-4">
               <input
@@ -444,13 +465,13 @@ const HealthProfile = () => {
                 placeholder="Notes"
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <button
+              <Button
                 type="button"
                 onClick={addContact}
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                size="sm"
               >
                 <Plus className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-3">
@@ -477,16 +498,22 @@ const HealthProfile = () => {
                   </button>
                 </div>
               ))}
-            </div>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Primary Physician */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center mb-4">
-              <Heart className="h-5 w-5 text-purple-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Primary Physician</h2>
-            </div>
-
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Primary Physician</CardTitle>
+                  <CardDescription>Your main healthcare provider</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -514,14 +541,18 @@ const HealthProfile = () => {
                 />
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Emergency Summary */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Public Emergency Summary</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              This information will be visible to emergency responders when they scan your QR code.
-            </p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Public Emergency Summary</CardTitle>
+              <CardDescription>
+                This information will be visible to emergency responders when they scan your QR code.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
             <textarea
               value={profile.public_emergency_summary}
               onChange={(e) => handleInputChange('public_emergency_summary', e.target.value)}
@@ -529,20 +560,20 @@ const HealthProfile = () => {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Submit Button */}
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
               disabled={saving}
-              className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-                saving ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              size="lg"
+              className="min-w-[150px]"
             >
               <Save className="h-5 w-5 mr-2" />
               {saving ? 'Saving...' : 'Save Profile'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

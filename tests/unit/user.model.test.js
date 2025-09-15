@@ -5,7 +5,9 @@ describe('User Model', () => {
   beforeEach(() => {
     // Clear any existing model compilation
     delete mongoose.models.User;
-    delete mongoose.modelSchemas.User;
+    if (mongoose.modelSchemas) {
+      delete mongoose.modelSchemas.User;
+    }
   });
 
   it('should create a valid user', async () => {

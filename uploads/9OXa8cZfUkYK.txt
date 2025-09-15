@@ -1,0 +1,13 @@
+PRESCRIPTION
+
+Patient: Ms. Anita Sharma
+Date: Mon Jan 08 2024 05:30:00 GMT+0530 (India Standard Time)
+
+Medication:
+- Asthma Management
+
+Instructions:
+Bronchodilator and controller therapy for asthma
+
+Prescribed by: Dr. Smith
+License: MD12345

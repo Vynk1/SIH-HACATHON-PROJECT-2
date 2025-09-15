@@ -1,7 +1,7 @@
 // routes/admin.routes.js
 const express = require('express');
 const router = express.Router();
-const adminCtrl = require('../controllers/admin.controller');
+const adminCtrl = require('../controller/admin.controller');
 const auth = require('../middleware/auth');
 
 // Admin endpoints (auth middleware should also verify role; controller double-checks)

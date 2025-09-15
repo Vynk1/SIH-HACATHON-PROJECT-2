@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swasthya Health Card - API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .file-input {
+            margin: 10px 0;
+        }
+        .record-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .file-item {
+            background: #f8f9fa;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 Swasthya Health Card - API Test Page</h1>
+    
+    <!-- Registration Section -->
+    <div class="container">
+        <h2>📝 Registration</h2>
+        <div>
+            <label>Full Name:</label>
+            <input type="text" id="regFullName" placeholder="Enter full name">
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="regEmail" placeholder="Enter email">
+        </div>
+        <div>
+            <label>Phone:</label>
+            <input type="tel" id="regPhone" placeholder="Enter phone number">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="regPassword" placeholder="Enter password">
+            <small>Must be 8+ characters with uppercase, lowercase, and number</small>
+        </div>
+        <button onclick="register()">Register</button>
+        <div id="registerStatus"></div>
+    </div>
+
+    <!-- Login Section -->
+    <div class="container">
+        <h2>🔐 Login</h2>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="loginEmail" value="rajesh.kumar@demo.com" placeholder="Enter email">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="loginPassword" value="demo123" placeholder="Enter password">
+        </div>
+        <button onclick="login()">Login</button>
+        <button onclick="logout()">Logout</button>
+        <div id="authStatus"></div>
+    </div>
+
+    <!-- Health Profile Section -->
+    <div class="container">
+        <h2>👤 Health Profile</h2>
+        <button onclick="getProfile()" id="getProfileBtn" disabled>Get My Profile</button>
+        <div id="profileInfo"></div>
+    </div>
+
+    <!-- Medical Records Section -->
+    <div class="container">
+        <h2>📋 Medical Records</h2>
+        <button onclick="getRecords()" id="getRecordsBtn" disabled>Get Medical Records</button>
+        <div id="recordsInfo"></div>
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="container">
+        <h2>📎 File Upload</h2>
+        <div class="file-input">
+            <label>Select file to upload (PDF, JPEG, PNG, WebP only):</label><br>
+            <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.webp">
+        </div>
+        <button onclick="uploadFile()" id="uploadBtn" disabled>Upload File</button>
+        <div id="uploadInfo"></div>
+    </div>
+
+    <!-- System Info Section -->
+    <div class="container info">
+        <h2>ℹ️ System Information</h2>
+        <p><strong>API Base URL:</strong> http://localhost:5000</p>
+        <p><strong>Available Demo Accounts:</strong></p>
+        <ul>
+            <li>rajesh.kumar@demo.com (Dr. Rajesh Kumar - Hypertension, Diabetes)</li>
+            <li>anita.sharma@demo.com (Ms. Anita Sharma - Asthma)</li>
+            <li>amit.patel@demo.com (Mr. Amit Patel - Arthritis, High Cholesterol)</li>
+            <li>sunita.verma@demo.com (Mrs. Sunita Verma - Chronic Migraine)</li>
+            <li>sanjay.gupta@demo.com (Mr. Sanjay Gupta - Allergies)</li>
+        </ul>
+        <p><strong>All demo accounts use password:</strong> demo123</p>
+        <p><strong>File Storage:</strong> <span id="storageInfo">Checking...</span></p>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        let authToken = null;
+
+        // Check server health and storage info on page load
+        window.onload = function() {
+            checkServerHealth();
+        };
+
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const health = await response.json();
+                document.getElementById('storageInfo').textContent = 'Server online - Local storage active (cloud storage not configured)';
+                document.getElementById('storageInfo').style.color = '#28a745';
+            } catch (error) {
+                document.getElementById('storageInfo').textContent = 'Server offline or unreachable';
+                document.getElementById('storageInfo').style.color = '#dc3545';
+            }
+        }
+
+        async function register() {
+            const fullName = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!fullName || !email || !password) {
+                showStatus('registerStatus', 'Please fill in all required fields', 'error');
+                return;
+            }
+
+            const userData = {
+                full_name: fullName,
+                email: email,
+                password: password
+            };
+            
+            if (phone) {
+                userData.phone = phone;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    showStatus('registerStatus', `✅ Registration successful! Welcome ${data.user.full_name}`, 'success');
+                    
+                    // Clear registration form
+                    document.getElementById('regFullName').value = '';
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPhone').value = '';
+                    document.getElementById('regPassword').value = '';
+                    
+                    // Enable buttons
+                    document.getElementById('getProfileBtn').disabled = false;
+                    document.getElementById('getRecordsBtn').disabled = false;
+                    document.getElementById('uploadBtn').disabled = false;
+                    
+                    // Update login status
+                    showStatus('authStatus', `✅ Logged in as ${data.user.full_name}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showStatus('registerStatus', `❌ Registration failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('registerStatus', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showStatus('authStatus', 'Please enter both email and password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    showStatus('authStatus', `✅ Login successful! Welcome ${email}`, 'success');
+                    
+                    // Enable buttons
+                    document.getElementById('getProfileBtn').disabled = false;
+                    document.getElementById('getRecordsBtn').disabled = false;
+                    document.getElementById('uploadBtn').disabled = false;
+                } else {
+                    const error = await response.json();
+                    showStatus('authStatus', `❌ Login failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('authStatus', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            showStatus('authStatus', '👋 Logged out', 'info');
+            
+            // Disable buttons
+            document.getElementById('getProfileBtn').disabled = true;
+            document.getElementById('getRecordsBtn').disabled = true;
+            document.getElementById('uploadBtn').disabled = true;
+            
+            // Clear content
+            document.getElementById('profileInfo').innerHTML = '';
+            document.getElementById('recordsInfo').innerHTML = '';
+            document.getElementById('uploadInfo').innerHTML = '';
+            document.getElementById('registerStatus').innerHTML = '';
+        }
+
+        async function getProfile() {
+            if (!authToken) {
+                showStatus('profileInfo', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/user/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const profile = data.profile;
+                    
+                    let html = `
+                        <div class="success">
+                            <h3>✅ Profile Retrieved</h3>
+                            <p><strong>Name:</strong> ${profile.full_name}</p>
+                            <p><strong>Email:</strong> ${profile.email}</p>
+                            <p><strong>Blood Group:</strong> ${profile.blood_group || 'Not set'}</p>
+                            <p><strong>Emergency Contacts:</strong> ${profile.emergency_contacts ? profile.emergency_contacts.length : 0}</p>
+                    `;
+                    
+                    if (profile.emergency_contacts && profile.emergency_contacts.length > 0) {
+                        html += '<h4>Emergency Contacts:</h4>';
+                        profile.emergency_contacts.forEach(contact => {
+                            html += `<p>• ${contact.name} (${contact.relation}) - ${contact.phone}</p>`;
+                        });
+                    }
+                    
+                    html += '</div>';
+                    document.getElementById('profileInfo').innerHTML = html;
+                } else {
+                    const error = await response.json();
+                    showStatus('profileInfo', `❌ Failed to get profile: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('profileInfo', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getRecords() {
+            if (!authToken) {
+                showStatus('recordsInfo', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/records`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    let html = `<div class="success">
+                        <h3>✅ Medical Records Retrieved</h3>
+                        <p><strong>Total Records:</strong> ${data.meta.total}</p>
+                    </div>`;
+                    
+                    if (data.data && data.data.length > 0) {
+                        data.data.forEach(record => {
+                            html += `
+                                <div class="record-item">
+                                    <h4>${record.title}</h4>
+                                    <p><strong>Type:</strong> ${record.type}</p>
+                                    <p><strong>Date:</strong> ${new Date(record.date_of_visit).toLocaleDateString()}</p>
+                                    <p><strong>Description:</strong> ${record.description}</p>
+                                    <p><strong>Files:</strong> ${record.files ? record.files.length : 0}</p>
+                            `;
+                            
+                            if (record.files && record.files.length > 0) {
+                                html += '<div style="margin-left: 20px;">';
+                                record.files.forEach(file => {
+                                    html += `
+                                        <div class="file-item">
+                                            📎 <strong>${file.filename}</strong> (${file.size} bytes)
+                                            <br><small>Type: ${file.mime}</small>
+                                            <br><a href="${API_BASE}${file.url}" target="_blank">📥 View/Download</a>
+                                        </div>
+                                    `;
+                                });
+                                html += '</div>';
+                            }
+                            
+                            html += '</div>';
+                        });
+                    }
+                    
+                    document.getElementById('recordsInfo').innerHTML = html;
+                } else {
+                    const error = await response.json();
+                    showStatus('recordsInfo', `❌ Failed to get records: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('recordsInfo', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function uploadFile() {
+            if (!authToken) {
+                showStatus('uploadInfo', '❌ Please login first', 'error');
+                return;
+            }
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('uploadInfo', '❌ Please select a file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                showStatus('uploadInfo', '⏳ Uploading...', 'info');
+                
+                const response = await fetch(`${API_BASE}/api/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const html = `
+                        <div class="success">
+                            <h4>✅ File uploaded successfully!</h4>
+                            <p><strong>Filename:</strong> ${data.filename}</p>
+                            <p><strong>Size:</strong> ${data.size} bytes</p>
+                            <p><strong>Type:</strong> ${data.mime}</p>
+                            <p><strong>Storage:</strong> ${data.upload_method}</p>
+                            <p><strong>File ID:</strong> ${data.id}</p>
+                            <a href="${data.url}" target="_blank">📥 View/Download File</a>
+                        </div>
+                    `;
+                    document.getElementById('uploadInfo').innerHTML = html;
+                } else {
+                    const error = await response.json();
+                    showStatus('uploadInfo', `❌ Upload failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus('uploadInfo', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

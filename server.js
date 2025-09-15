@@ -3,65 +3,89 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const morgan = require('morgan');
-const path = require('path');
 
 const app = express();
 
-// middlewares
+// Basic middlewares
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
 
-// CORS: allow frontend or allow all for demo
-const FRONTEND_URL = process.env.FRONTEND_URL || '*';
+// Serve uploaded files statically
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// CORS: allow frontend (allow multiple ports for development)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5174',
+    'http://localhost:5173',
+    'http://localhost:5178',  // Frontend configured port
+    FRONTEND_URL
+  ],
   credentials: true
 }));
 
-// Rate limiters (optional)
-const { authLimiter, generalLimiter } = require('./middleware/rateLimit');
-if (authLimiter) app.use('/api/auth', authLimiter);
-app.use(generalLimiter);
-
-// Connect to MongoDB
+// Simple MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
-const MONGO_DB = process.env.MONGO_DB || undefined;
+const MONGO_DB = process.env.MONGO_DB || 'swasthya_health_card';
+
 if (!MONGO_URI) {
-  console.error('MONGO_URI missing in .env');
+  console.error('❌ MONGO_URI missing in .env file');
   process.exit(1);
 }
-mongoose.connect(MONGO_URI, { dbName: MONGO_DB, useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => {
-    console.error('MongoDB connection error', err);
-    process.exit(1);
-  });
+
+// Connect to MongoDB
+mongoose.connect(MONGO_URI, {
+  dbName: MONGO_DB
+})
+.then(() => {
+  console.log(`✅ MongoDB connected successfully to database: ${MONGO_DB}`);
+})
+.catch((err) => {
+  console.error('❌ MongoDB connection failed:', err);
+  process.exit(1);
+});
+
+// No Swagger for simplified version
 
 // Mount routes
 app.use('/api/auth', require('./routes/auth.routes'));
-app.use('/api/user', require('./routes/card.routes'));
-app.use('/api/records', require('./routes/record.routes'));
-app.use('/api/public', require('./routes/public.routes')); // e.g., /api/public/e/:id, /api/public/share/:token
-app.use('/api/admin', require('./routes/admin.routes'));
+app.use('/api/user', require('./routes/cards.routes'));
+app.use('/api/records', require('./routes/records.routes'));
 app.use('/api/files', require('./routes/files.routes'));
+app.use('/api/public', require('./routes/public.routes'));
 
-// Public emergency endpoints — if you prefer short urls like /e/:id, you can mount:
-// app.use('/', require('./routes/public.routes')); // will expose /e/:id and /share/:token
+// Public emergency endpoints 
+app.use('/', require('./routes/public.routes'));
 
-// Static (optional) - serve uploads or client files if needed
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Health
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
-// Basic error handler
-app.use((err, req, res, next) => {
-  console.error('UNHANDLED_ERR', err && err.stack ? err.stack : err);
-  res.status(500).json({ message: err.message || 'Server error' });
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    endpoints: {
+      auth: '/api/auth (login, register)',
+      user_profile: '/api/user',
+      medical_records: '/api/records',
+      emergency_access: '/e/:id'
+    }
+  });
 });
 
-// Start
+// Simple error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || 'Server error';
+  res.status(status).json({ message });
+});
+
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+});

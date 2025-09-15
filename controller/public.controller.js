@@ -3,7 +3,7 @@ const HealthProfile = require('../models/HealthProfile');
 const EmergencyAccessLog = require('../models/EmergencyAccessLog');
 const ShareToken = require('../models/ShareToken');
 const MedicalRecord = require('../models/MedicalRecord');
-const User = require('../models/User');
+const User = require('../models/user');
 
 /**
  * GET /e/:publicId

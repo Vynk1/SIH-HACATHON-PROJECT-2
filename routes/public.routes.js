@@ -1,7 +1,7 @@
 // routes/public.routes.js
 const express = require('express');
 const router = express.Router();
-const pub = require('../controllers/public.controller');
+const pub = require('../controller/public.controller');
 
 // Public emergency view (no auth)
 router.get('/e/:publicId', pub.publicEmergencyView);

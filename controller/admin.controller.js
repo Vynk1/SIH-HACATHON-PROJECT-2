@@ -1,8 +1,8 @@
 // controllers/admin.controller.js
-const User = require('../models/User');
+const User = require('../models/user');
 const HealthProfile = require('../models/HealthProfile');
 const MedicalRecord = require('../models/MedicalRecord');
-const Donation = require('../models/Donation'); // if used
+// const Donation = require('../models/Donation'); // if used
 const EmergencyAccessLog = require('../models/EmergencyAccessLog');
 
 /**

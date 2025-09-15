@@ -1,7 +1,7 @@
 // routes/card.routes.js
 const express = require('express');
 const router = express.Router();
-const cardCtrl = require('../controllers/card.controller');
+const cardCtrl = require('../controller/card.controller');
 const auth = require('../middleware/auth');
 
 router.get('/me', auth(), cardCtrl.getMyProfile);

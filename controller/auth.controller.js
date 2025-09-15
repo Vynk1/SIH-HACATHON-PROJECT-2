@@ -9,7 +9,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 exports.register = async (req, res) => {
   try {
     const { full_name, email, phone, password, role = 'patient' } = req.body;
-    if (!full_name || !email || !password) return res.status(400).json({ message: 'name, email and password required' });
+    // Validation is now handled by middleware
 
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) return res.status(409).json({ message: 'Email already registered' });
@@ -27,14 +27,23 @@ exports.register = async (req, res) => {
     res.status(201).json({ token, user: { _id: user._id, full_name: user.full_name, email: user.email, role: user.role } });
   } catch (err) {
     console.error('REGISTER_ERR', err);
-    res.status(500).json({ message: 'Server error' });
+    // Handle specific mongoose errors
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyValue)[0];
+      return res.status(409).json({ message: `${field} already exists` });
+    }
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: errors.join(', ') });
+    }
+    res.status(500).json({ message: 'Registration failed. Please try again.' });
   }
 };
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: 'email and password required' });
+    // Validation is now handled by middleware
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
@@ -46,7 +55,13 @@ exports.login = async (req, res) => {
     res.json({ token, user: { _id: user._id, full_name: user.full_name, email: user.email, role: user.role } });
   } catch (err) {
     console.error('LOGIN_ERR', err);
-    res.status(500).json({ message: 'Server error' });
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired' });
+    }
+    res.status(500).json({ message: 'Login failed. Please try again.' });
   }
 };
 

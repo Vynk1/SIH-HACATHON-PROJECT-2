@@ -1,0 +1,13 @@
+PRESCRIPTION
+
+Patient: Mr. Sanjay Gupta
+Date: Wed Feb 14 2024 05:30:00 GMT+0530 (India Standard Time)
+
+Medication:
+- Allergy Management
+
+Instructions:
+Antihistamine and nasal spray for allergic rhinitis
+
+Prescribed by: Dr. Smith
+License: MD12345

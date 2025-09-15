@@ -1,7 +1,7 @@
 // routes/record.routes.js
 const express = require('express');
 const router = express.Router();
-const rec = require('../controllers/record.controller');
+const rec = require('../controller/record.controller');
 const auth = require('../middleware/auth');
 
 // Create record (patient or provider)

@@ -1,0 +1,12 @@
+LAB REPORT
+
+Patient: Mr. Sanjay Gupta
+Test Date: Sat Jan 20 2024 05:30:00 GMT+0530 (India Standard Time)
+Report: Allergy Testing
+
+Results:
+- All values within normal range
+- Follow-up recommended
+
+Tested by: City Lab
+Report ID: LAB4686
